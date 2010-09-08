@@ -65,9 +65,11 @@ local function _do_request(url, method, content)
    -- Converting lua object in content to json. If content is set, we should
    -- also set the Content-Type header
    if content ~= nil then
-      source = ltn12.source.string(json.encode(content))
+      local ct = json.encode(content)
+      source = ltn12.source.string(ct)
       headers = {}
       headers['Content-Type'] = 'application/json'
+      headers['Content-Length'] = #ct
    end
 
    local _, code, headers, human_readable_error = http.request{
