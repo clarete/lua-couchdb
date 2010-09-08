@@ -52,7 +52,7 @@ function Document:new(schema)
    self.__index = self
    self.schema = schema
    if schema.id ~= nil then
-      self.id = schema.id
+      o.id = schema.id
    end
    return o
 end
