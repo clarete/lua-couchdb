@@ -17,7 +17,6 @@
 
 module("couchdb", package.seeall)
 local json = require("json")
-local socket = require("socket")
 local http = require("socket.http")
 local ltn12 = require("ltn12")
 
