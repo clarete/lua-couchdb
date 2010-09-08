@@ -20,11 +20,15 @@ local json = require("json")
 local http = require("socket.http")
 local ltn12 = require("ltn12")
 
+-- Prototypes
+
 Session = {uri="http://localhost:5984"}
 
 Database = {session=nil, name=nil}
 
 Document = {id=nil, rev=nil, schema=nil}
+
+-- Constructors
 
 function Session:new(uri)
    local o = {}
@@ -55,6 +59,8 @@ function Document:new(schema)
    end
    return o
 end
+
+-- Local functions
 
 local function _do_request(url, method, content)
    local t = {}
@@ -90,6 +96,8 @@ local function _do_request(url, method, content)
    end
 end
 
+-- Session methods
+
 function Session:all_dbs()
    local result = {}
    for _, v in pairs(_do_request(self.uri .. "/_all_dbs", "GET")) do
@@ -97,6 +105,8 @@ function Session:all_dbs()
    end
    return result
 end
+
+-- Database methods
 
 function Database:create()
    _do_request(self.session.uri .. "/" .. self.name, "PUT")
@@ -125,5 +135,7 @@ function Database:all_docs()
    local uri = string.format("%s/%s/_all_docs", self.session.uri, self.name)
    return _do_request(uri, "GET")
 end
+
+-- Document methods
 
 return _M
