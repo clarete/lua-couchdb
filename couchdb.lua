@@ -83,7 +83,7 @@ local function _do_request(url, method, content)
 
    -- Handling all errors together
    if code > 299 then
-      error({message=human_readable_error})
+      error(human_readable_error)
    else
       return json.decode(body)
    end
