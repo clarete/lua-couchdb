@@ -14,8 +14,11 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 module("couchdb", package.seeall)
+local json = require("json")
+local socket = require("socket")
+local http = require("socket.http")
 
-local Session = {uri="http://localhost:5984"}
+Session = {uri="http://localhost:5984"}
 
 function Session:new(uri)
    local o = {}
@@ -27,6 +30,18 @@ function Session:new(uri)
    return o
 end
 
+function Session:all_dbs()
+   local url = self.uri .. "/_all_dbs"
+   local body, code, headers, human_readable_error = http.request(url)
+   if code ~= 200 then
+      error({message=human_readable_error})
+   else
+      return json.decode(body)
+   end
+end
+
 function Session:create_database(name)
    -- FIXME: Build a json request and then send it through HTTP
 end
+
+return _M
