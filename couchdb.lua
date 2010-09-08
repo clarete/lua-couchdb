@@ -1,4 +1,6 @@
+-- Copyright (C) 2010  Ministério da Cultura do Brasil
 -- Copyright (C) 2010  Lincoln de Sousa <lincoln@comum.org>
+-- Copyright (C) 2010  Thiago Silva <thiago@comum.org>
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as published by
