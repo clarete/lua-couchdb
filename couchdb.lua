@@ -17,6 +17,7 @@ module("couchdb", package.seeall)
 local json = require("json")
 local socket = require("socket")
 local http = require("socket.http")
+local ltn12 = require("ltn12")
 
 Session = {uri="http://localhost:5984"}
 
@@ -30,18 +31,31 @@ function Session:new(uri)
    return o
 end
 
-function Session:all_dbs()
-   local url = self.uri .. "/_all_dbs"
-   local body, code, headers, human_readable_error = http.request(url)
-   if code ~= 200 then
+local function _do_request(url, method)
+   local t = {}
+   local _, code, headers, human_readable_error = http.request{
+      url=url,
+      method=method,
+      sink=ltn12.sink.table(t)
+   }
+
+   -- Getting the body content from the ltn12 sink
+   local body = t[1]
+
+   -- Handling all errors together
+   if code > 299 then
       error({message=human_readable_error})
    else
       return json.decode(body)
    end
 end
 
+function Session:all_dbs()
+   return _do_request(self.uri .. "/_all_dbs", "GET")
+end
+
 function Session:create_database(name)
-   -- FIXME: Build a json request and then send it through HTTP
+   return _do_request(self.uri .. "/" .. name, "PUT")
 end
 
 return _M
