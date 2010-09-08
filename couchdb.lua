@@ -81,7 +81,7 @@ local function _do_request(url, method, content)
    }
 
    -- Getting the body content from the ltn12 sink
-   local body = t[1]
+   local body = table.concat(t)
 
    -- Handling all errors together
    if code > 299 then
