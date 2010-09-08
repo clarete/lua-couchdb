@@ -19,6 +19,8 @@ local socket = require("socket")
 local http = require("socket.http")
 local ltn12 = require("ltn12")
 
+Database = {session=nil, name=nil}
+
 Session = {uri="http://localhost:5984"}
 
 function Session:new(uri)
@@ -28,6 +30,15 @@ function Session:new(uri)
    if uri ~= nil then
       o.uri = uri
    end
+   return o
+end
+
+function Database:new(session, name)
+   local o = {}
+   setmetatable(o, self)
+   self.__index = self
+   o.session = session
+   o.name = name
    return o
 end
 
@@ -51,15 +62,19 @@ local function _do_request(url, method)
 end
 
 function Session:all_dbs()
-   return _do_request(self.uri .. "/_all_dbs", "GET")
+   local result = {}
+   for _, v in pairs(_do_request(self.uri .. "/_all_dbs", "GET")) do
+      table.insert(result, Database:new(self, v))
+   end
+   return result
 end
 
-function Session:create_database(name)
-   return _do_request(self.uri .. "/" .. name, "PUT")
+function Database:create()
+   _do_request(self.session.uri .. "/" .. self.name, "PUT")
 end
 
-function Session:delete_database(name)
-   return _do_request(self.uri .. "/" .. name, "DELETE")
+function Database:delete()
+   return _do_request(self.session.uri .. "/" .. self.name, "DELETE")
 end
 
 return _M
