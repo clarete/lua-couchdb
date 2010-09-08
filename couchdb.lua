@@ -131,6 +131,15 @@ function Database:put(doc)
    doc.rev = result.rev
 end
 
+function Database:delete_doc(doc)
+   local uri = string.format(
+      "%s/%s/%s?rev=%s", self.session.uri, self.name, doc.id, doc.rev)
+   local result =_do_request(uri, "DELETE")
+   doc.id = nil
+   doc.rev = nil
+   return result
+end
+
 function Database:all_docs()
    local uri = string.format("%s/%s/_all_docs", self.session.uri, self.name)
    return _do_request(uri, "GET")
