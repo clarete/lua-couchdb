@@ -122,4 +122,9 @@ function Database:put(doc)
    doc.rev = result.rev
 end
 
+function Database:all_docs()
+   local uri = string.format("%s/%s/_all_docs", self.session.uri, self.name)
+   return _do_request(uri, "GET")
+end
+
 return _M
