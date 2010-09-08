@@ -58,4 +58,8 @@ function Session:create_database(name)
    return _do_request(self.uri .. "/" .. name, "PUT")
 end
 
+function Session:delete_database(name)
+   return _do_request(self.uri .. "/" .. name, "DELETE")
+end
+
 return _M
