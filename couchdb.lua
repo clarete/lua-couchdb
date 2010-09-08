@@ -21,9 +21,11 @@ local socket = require("socket")
 local http = require("socket.http")
 local ltn12 = require("ltn12")
 
+Session = {uri="http://localhost:5984"}
+
 Database = {session=nil, name=nil}
 
-Session = {uri="http://localhost:5984"}
+Document = {id=nil, rev=nil, schema=nil}
 
 function Session:new(uri)
    local o = {}
@@ -44,12 +46,36 @@ function Database:new(session, name)
    return o
 end
 
-local function _do_request(url, method)
+function Document:new(schema)
+   local o = {}
+   setmetatable(o, self)
+   self.__index = self
+   self.schema = schema
+   if schema.id ~= nil then
+      self.id = schema.id
+   end
+   return o
+end
+
+local function _do_request(url, method, content)
    local t = {}
+   local source = nil
+   local headers = nil
+
+   -- Converting lua object in content to json. If content is set, we should
+   -- also set the Content-Type header
+   if content ~= nil then
+      source = ltn12.source.string(json.encode(content))
+      headers = {}
+      headers['Content-Type'] = 'application/json'
+   end
+
    local _, code, headers, human_readable_error = http.request{
       url=url,
       method=method,
-      sink=ltn12.sink.table(t)
+      headers=headers,
+      sink=ltn12.sink.table(t),
+      source=source
    }
 
    -- Getting the body content from the ltn12 sink
@@ -77,6 +103,21 @@ end
 
 function Database:delete()
    return _do_request(self.session.uri .. "/" .. self.name, "DELETE")
+end
+
+function Database:put(doc)
+   local result = nil
+   if doc.id ~= nil then
+      result = _do_request(
+         string.format("%s/%s/%s", self.session.uri, self.name, doc.id),
+         "PUT", doc.schema)
+   else
+      result = _do_request(
+         string.format("%s/%s", self.session.uri, self.name), "POST",
+         doc.schema)
+   end
+   doc.id = result.id
+   doc.rev = result.rev
 end
 
 return _M
