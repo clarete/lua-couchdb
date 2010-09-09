@@ -104,7 +104,7 @@ function create_document(schema)
    local obj = delegate(Document)
    if schema.id then
       obj.id = schema.id
-      obj.schema = select(obj, function(v,k) return k ~= 'id' end)
+      obj.schema = select(schema, function(v,k) return k ~= 'id' end)
    else
       obj.schema = schema
    end
