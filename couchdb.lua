@@ -37,6 +37,19 @@ local function delegate(parent)
    return obj
 end
 
+
+-- util
+
+function select(tb, fun)
+   local ret = {}
+   for k,v in pairs(tb) do
+      if (fun(v,k)) then
+         ret[k] = v
+      end
+   end
+   return ret
+end
+
 -- Local functions
 
 local function _do_request(url, method, content)
@@ -89,8 +102,12 @@ end
 
 function create_document(schema)
    local obj = delegate(Document)
-   obj.schema = schema
-   obj.id = schema.id or obj.id
+   if schema.id then
+      obj.id = schema.id
+      obj.schema = select(obj, function(v,k) return k ~= 'id' end)
+   else
+      obj.schema = schema
+   end
    return obj
 end
 
