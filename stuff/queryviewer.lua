@@ -41,7 +41,8 @@ function Application:new()
 
    -- The entry that will hold the database uri
    self.dbentry = gtk.entry_new()
-   local label = gtk.label_new('Database uri: ')
+   local label = gtk.label_new_with_mnemonic('_Database uri: ')
+   label:set_mnemonic_widget(self.dbentry)
    local hbox = gtk.hbox_new(false, 0)
    hbox:pack_start(label, false, false, 0)
    hbox:pack_start(self.dbentry, true, true, 0)
