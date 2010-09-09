@@ -22,42 +22,19 @@ local ltn12 = require("ltn12")
 
 -- Prototypes
 
-Session = {uri="http://localhost:5984"}
+local Session = {uri="http://localhost:5984"}
 
-Database = {session=nil, name=nil}
+local Database = {session=nil, name=nil}
 
-Document = {id=nil, rev=nil, schema=nil}
+local Document = {id=nil, rev=nil, schema=nil}
 
--- Constructors
 
-function Session:new(uri)
-   local o = {}
-   setmetatable(o, self)
-   self.__index = self
-   if uri ~= nil then
-      o.uri = uri
-   end
-   return o
-end
-
-function Database:new(session, name)
-   local o = {}
-   setmetatable(o, self)
-   self.__index = self
-   o.session = session
-   o.name = name
-   return o
-end
-
-function Document:new(schema)
-   local o = {}
-   setmetatable(o, self)
-   self.__index = self
-   self.schema = schema
-   if schema.id ~= nil then
-      o.id = schema.id
-   end
-   return o
+local function delegate(parent)
+   local obj = {}
+   local mt = {}
+   setmetatable(obj, mt)
+   mt.__index = parent
+   return obj
 end
 
 -- Local functions
@@ -96,12 +73,34 @@ local function _do_request(url, method, content)
    end
 end
 
+-- Constructors
+
+function create_session(uri)
+   local obj = delegate(Session)
+   obj.uri = uri or obj.uri
+   return obj
+end
+
+function create_database(session,name)
+   local obj = delegate(Database)
+   obj.session, obj.name = session, name
+   return obj
+end
+
+function create_document(schema)
+   local obj = delegate(Document)
+   obj.schema = schema
+   obj.id = schema.id or obj.id
+   return obj
+end
+
+
 -- Session methods
 
 function Session:all_dbs()
    local result = {}
    for _, v in pairs(_do_request(self.uri .. "/_all_dbs", "GET")) do
-      table.insert(result, Database:new(self, v))
+      table.insert(result, create_database(self, v))
    end
    return result
 end
