@@ -59,7 +59,7 @@ local function _do_request(url, method, content)
 
    -- Converting lua object in content to json. If content is set, we should
    -- also set the Content-Type header
-   if content ~= nil then
+   if content then
       local ct = json.encode(content)
       source = ltn12.source.string(ct)
       headers = {}
@@ -134,7 +134,7 @@ end
 
 function Database:put(doc)
    local result = nil
-   if doc.id ~= nil then
+   if doc.id then
       result = _do_request(
          string.format("%s/%s/%s", self.session.uri, self.name, doc.id),
          "PUT", doc.schema)
