@@ -28,6 +28,7 @@ local Database = {session=nil, name=nil}
 
 local Document = {id=nil, rev=nil, schema=nil}
 
+-- util
 
 local function delegate(parent)
    local obj = {}
@@ -36,9 +37,6 @@ local function delegate(parent)
    mt.__index = parent
    return obj
 end
-
-
--- util
 
 function select(tb, fun)
    local ret = {}
